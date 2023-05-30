@@ -2,7 +2,7 @@
 import { useSession } from 'next-auth/react';
   import React, { useState } from 'react'
 
-  const Song = ({sno, track,setGlobalCurrentSongId, setGlobalIsTrackPlaying}) => {
+  const Song = ({sno, track,setGlobalCurrentSongId , setGlobalIsTrackPlaying, setView, setGlobalArtistId}) => {
       const {data: session} = useSession()
       const [hover, setHover] = useState(false)
 
@@ -36,18 +36,23 @@ import { useSession } from 'next-auth/react';
           );
       }
 
+      function selectArtist(artist){
+        setView("artist")
+        setGlobalArtistId(artist.id)
+      }
+
     return (
-      <div onClick={async () => await playSong(track)} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} className='grid grid-cols-2 text-neutral-400 text-sm py-4 px-5 hover:bg-white hover:bg-opacity-10 rounded-lg cursor-default'>
+      <div onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} className='grid grid-cols-2 text-neutral-400 text-sm py-4 px-5 hover:bg-white hover:bg-opacity-10 rounded-lg cursor-default'>
         <div className='flex items-center space-x-4'>
-        {hover? <PlayIcon className='h-5 w-5 text-white' /> : <p className='w-5'>{sno + 1}</p>}
+        {hover? <PlayIcon onClick={async () => await playSong(track)} className='h-5 w-5 text-white' /> : <p className='w-5'>{sno + 1}</p>}
           {track?.album?.images[0]?.url && <img className='h-10 w-10' src={track.album.images[0].url} />}
           <div>
-              <p className='w-36 lg:w-64 truncate text-white text-base'>{track.name}</p>
+              <p className='w-36 lg:w-64 truncate text-white text-base'>{track?.name}</p>
               <p className='w-36 truncate'>
               {
-                    track.artists.map((artist, i) => (
+                    track?.artists.map((artist, i) => (
                       <React.Fragment key={i}>
-                        <span className="hover:underline">{artist.name}</span>
+                        <span onClick={() => selectArtist(artist)} className="hover:underline">{artist.name}</span>
                         {i !== track.artists.length - 1 && <span>, </span>}
                       </React.Fragment>
                     ))
@@ -57,8 +62,8 @@ import { useSession } from 'next-auth/react';
           </div>
         </div>
         <div className='flex items-center justify-between ml-auto md:ml-0'>
-          <p className='w-40 truncate hidden md:inline'>{track.album.name}</p>
-          <p>{millisToMinutesAndSeconds(track.duration_ms)}</p>
+          <p className='w-40 truncate hidden md:inline'>{track?.album.name}</p>
+          <p>{millisToMinutesAndSeconds(track?.duration_ms)}</p>
 
         </div>
       </div>
